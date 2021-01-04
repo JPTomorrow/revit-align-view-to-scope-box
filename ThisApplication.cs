@@ -16,28 +16,13 @@ namespace MainApp
 	[Autodesk.Revit.DB.Macros.AddInId("9BBF529B-520A-4877-B63B-BEF1238B6A05")]
     public partial class ThisApplication : IExternalCommand
     {
-		public static string[] Data_Dirs { get; } = new string[] {
-			"data",
-		};
-
-		public static string App_Base_Path { get; set; } = null;
-		public static string Settings_Base_Path { get; private set; }
-		public static bool TestBed_Debug_Switch {get; set; } = false;
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 			//set revit model info
-			ModelInfo revit_info = ModelInfo.StoreDocuments(commandData);
-
-			// set app path
-			Assembly assem = Assembly.GetExecutingAssembly();
-			UriBuilder uri = new UriBuilder(assem.CodeBase);
-			string module_path = Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
-			App_Base_Path = RAP.GetApplicationBasePath(module_path, assem.GetName().Name, String.Join, TestBed_Debug_Switch);
-			Settings_Base_Path = App_Base_Path + "settings\\";
-
-			//create data directories
-			RAP.GenAppStorageStruct(Settings_Base_Path, Data_Dirs, Directory.CreateDirectory, Directory.Exists);
+			string[] dataDirectories = new string[] { "data", };
+			bool debugApp = false;
+			ModelInfo revit_info = ModelInfo.StoreDocuments(commandData, dataDirectories, debugApp);
 
 			Result ret()
 			{

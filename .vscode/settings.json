@@ -1,0 +1,7 @@
+{
+	"search.exclude": {
+		"**/build/**": true,
+		"**/obj/**": true,
+		"**/refs/**": true
+	}
+}

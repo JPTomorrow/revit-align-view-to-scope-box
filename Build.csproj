@@ -1,88 +1,183 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Align3DViewToScopeBox</AssemblyName>
-    <LangVersion>8.0</LangVersion>
-    <OutputType>Library</OutputType>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <OutputPath>./build</OutputPath>
+    <PrefixAssembly>Align3DViewToScopeBox</PrefixAssembly> <!-- Assembly name prefix (should be the name of the program) -->
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <!-- ###COMPILE INCLUDE### -->
 
+  <PropertyGroup>
+    <Configurations>Release</Configurations>
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>portable</DebugType>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultItems>false</EnableDefaultItems>
+	  <OutputType>Library</OutputType>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+	  <OutputPath>./build</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(RevitYearArg.Contains('2017'))">
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK452</DefineConstants>
+    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RevitVersion>2017</RevitVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(RevitYearArg.Contains('2018'))">
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK47</DefineConstants>
+    <TargetFramework>net46</TargetFramework>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <RevitVersion>2018</RevitVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(RevitYearArg.Contains('2019'))">
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK47</DefineConstants>
+    <TargetFramework>net47</TargetFramework>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <RevitVersion>2019</RevitVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(RevitYearArg.Contains('2020'))">
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK47</DefineConstants>
+    <TargetFramework>net47</TargetFramework>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <RevitVersion>2020</RevitVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == '' ">
+    <LangVersion>8.0</LangVersion>
+    <TargetFramework>net47</TargetFramework>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <RevitVersion>2020</RevitVersion>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!-- defines conditional directive REVIT2016, REVIT2017 ... --> 
+    <DefineConstants>$(DefineConstants);REVIT$(RevitVersion)</DefineConstants> 
+    <AssemblyName>$(PrefixAssembly)_$(RevitVersion)</AssemblyName>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Path_DLL_API>.\refs</Path_DLL_API>
+  </PropertyGroup>
+
+    <ItemGroup>
     <Compile Include="*.cs"/>
     <Compile Include="./libs/*.cs"/>
-    <Compile Include="../common_build_source/*.cs"/>
-
+    <Compile Include="./libs/*/*.cs"/>
   </ItemGroup>
-  <ItemGroup>
-    <!-- ###PAGE INCLUDE### -->
 
-
-  </ItemGroup>
   <ItemGroup>
+
     <Reference Include="RevitAPI">
-      <HintPath>.\refs\RevitAPI.dll</HintPath>
+      <HintPath>$(Path_DLL_API)\$(RevitVersion)\RevitAPI.dll</HintPath>
     </Reference>
+
     <Reference Include="RevitAPIUI">
-      <HintPath>.\refs\RevitAPIUI.dll</HintPath>
+      <HintPath>$(Path_DLL_API)\$(RevitVersion)\RevitAPIUI.dll</HintPath>
     </Reference>
+    
+
     <Reference Include="System"/>
+    <Reference Include="System.Data"/>
     <Reference Include="System.Windows.Forms"/>
     <Reference Include="System.Drawing"/>
+    <Reference Include="System.Management"/>
+    <Reference Include="System.Runtime.Serialization"/>
+    <Reference Include="System.Runtime.Serialization.Json"/>
+    <Reference Include="System.Xaml"/>
+    <Reference Include="System.Xml"/>
     <Reference Include="WindowsBase"/>
     <Reference Include="PresentationCore"/>
     <Reference Include="PresentationFramework"/>
-    <Reference Include="System.Xaml"/>
-    <Reference Include="System.Xml"/>
     <Reference Include="System.Runtime.Serialization"/>
     <Reference Include="System.Runtime.Serialization.Json"/>
-
   </ItemGroup>
 
-  <Target Name="ILMerge">
-    <Message Text="Performing the Ilmerge." />
+  <Target Name="ILRepack" AfterTargets="Build">
+
+    <!-- Outputs="$(IntermediateOutputPath)$(TargetFileName)" -->
+    <!-- Outputs="$(TargetPath)" -->
+    <Message Importance="high" Text="Compacting DLLs with ILRepack"  />
+    <!-- in this CreateItem stanza, we collect all the DLLs for the referenced projects -->
     <ItemGroup>
-      <_MergeItem Include="build/$(AssemblyName).dll" />
+      <_MergeItem Include="build/$(TargetFramework)\$(AssemblyName).dll" />
     </ItemGroup>
 
-    <CreateItem Include="build/$(AssemblyName).dll">
+    <CreateItem Include="build/$(TargetFramework)/$(AssemblyName).dll">
       <Output TaskParameter="Include" ItemName="AssembliesToMerge" />
     </CreateItem>
 
-    <Message Text="AssembliesToMerge= @(AssembliesToMerge -> '&quot;%(Fullpath)&quot;', ' ')" />
 
+    <!-- This weird bit of hieroglyphics is the assemblies to merge, quoted, and separated by spaces -->
+    <!-- Example:  "c:\foo\project1\bin\Debug\ProjectOne.dll"   "c:\foo\project2\bin\Debug\ProjectTwo.dll"  -->
+    <Message Text="AssembliesToMerge= @(AssembliesToMerge -> '&quot;%(Fullpath)&quot;', ' ')" />
+    <!-- Message Text="TargetPath= $(TargetPath)" / -->
     <Message Text="TargetFileName= $(TargetFileName)" />
+    <!-- produce the merged assembly - putting the output in the "IntermediateOutputPath" eg obj\Debug. -->
+    <!-- it will be copied later by the CopyFilestoOutputDirectory task defined in Microsoft.Common.Targets -->
 
     <Error
       Text="ILMerge cannot be found. You need to download and install ILMerge in order to build DotNetZip."
       Condition="!Exists('packages\ILRepack.2.0.18\tools\ILRepack.exe')" />
 
-    <Exec Command="packages\ILRepack.2.0.18\tools\ILRepack.exe /lib:build /xmldocs /out:build/merge/$(TargetFileName)  @(AssembliesToMerge -> '%(Fullpath)', ' ') " />
+    <Exec Command="packages\ILRepack.2.0.18\tools\ILRepack.exe /lib:build/$(TargetFramework) /xmldocs /out:build/$(TargetFramework)/merge/$(TargetFileName)  @(AssembliesToMerge -> '%(Fullpath)', ' ') " />
+  </Target>
 
+
+  <!-- Copy files post build target -->
+  
+  <Target Name="CopyFilesAfterBuild" AfterTargets="ILRepack">
+    <!-- for some reason the XML doc file does not get copied automatically from obj\Debug to bin\Debug. -->
+    <!-- we do it here explicitly. -->
     <ItemGroup>
-      <_CopyItems Include="build\merge\*.*" />
-      <_CopyItems Include="build\RevitAPI*.*" />
+      <_CopyItems Include="build\$(TargetFramework)\merge\*.*" />
+      <_CopyItems Include="build\$(TargetFramework)\RevitAPI*.*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(_CopyItems)" DestinationFolder="C:\ProgramData\Autodesk\Revit\Addins\MarathonScripts\$(AssemblyName)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)" />
+    <Copy SourceFiles="@(_CopyItems)" DestinationFolder="C:\ProgramData\Autodesk\Revit\Addins\MarathonScripts\$(PrefixAssembly)"
+	  SkipUnchangedFiles="false" OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)" />
   </Target>
+
+</Project>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  
+
+
+
+
+
+
+
+
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
 </Project>
+-->

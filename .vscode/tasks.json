@@ -1,41 +1,75 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-        {
-            "label": "Initial",
+        { // build for revit 2017
+            "label": "b2017",
             "type": "shell",
             "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "args": [
+                "-r",
+                "-verbosity:n",
                 "Build.csproj",
-                "//t:Build",
-                "//p:Configuration=Debug",
-                "//p:Platform=\"AnyCPU\"",
-                "//property:GenerateFullPaths=true",
+                "/t:Build",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:RevitYearArg=2017",
+                "/property:GenerateFullPaths=true",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        { // build for revit 2018
+            "label": "b2018",
+            "type": "shell",
+            "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "-r",
+                "-verbosity:n",
+                "Build.csproj",
+                "/t:Build",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:RevitYearArg=2018",
+                "/property:GenerateFullPaths=true",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        { // build for revit 2019
+            "label": "b2019",
+            "type": "shell",
+            "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "-r",
+                "Build.csproj",
+                "/t:Build",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:RevitYearArg=2019",
+                "/property:GenerateFullPaths=true",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        { // build for revit 2020
+            "label": "b2020",
+            "type": "shell",
+            "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "-r",
+                "Build.csproj",
+                "/t:Build",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:RevitYearArg=2020",
+                "/property:GenerateFullPaths=true",
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "ILMerge",
-            "type": "shell",
-            "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
-            "args": [
-                "Build.csproj",
-                "//t:ILMerge",
-                "//p:Configuration=Debug",
-                "//p:Platform=\"AnyCPU\"",
-                "//property:GenerateFullPaths=true",
-                "//verbosity:quiet",
-            ],
-        },
-        {
             "label": "MasterBuild",
-            "dependsOn": ["Initial", "ILMerge"],
+            "dependsOn": ["b2017", "b2018", "b2019", "b2020" ],
             "dependsOrder": "sequence",
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "reveal": "always",
@@ -45,6 +79,6 @@
                 "showReuseMessage": false,
                 "clear": true
             }
-        }
+        },
     ]
 }
