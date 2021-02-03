@@ -47,11 +47,19 @@
     <RevitVersion>2020</RevitVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(RevitYearArg.Contains('2021'))">
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK47</DefineConstants>
+    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <RevitVersion>2021</RevitVersion>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == '' ">
     <LangVersion>8.0</LangVersion>
-    <TargetFramework>net47</TargetFramework>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <RevitVersion>2020</RevitVersion>
+    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <RevitVersion>2021</RevitVersion>
   </PropertyGroup>
   
   <PropertyGroup>

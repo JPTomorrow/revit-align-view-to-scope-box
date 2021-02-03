@@ -63,9 +63,24 @@
             ],
             "problemMatcher": "$msCompile"
         },
+        { // build for revit 2021
+            "label": "b2021",
+            "type": "shell",
+            "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "-r",
+                "Build.csproj",
+                "/t:Build",
+                "/p:Configuration=Release",
+                "/p:Platform=x64",
+                "/p:RevitYearArg=2021",
+                "/property:GenerateFullPaths=true",
+            ],
+            "problemMatcher": "$msCompile"
+        },
         {
             "label": "MasterBuild",
-            "dependsOn": ["b2017", "b2018", "b2019", "b2020" ],
+            "dependsOn": ["b2017", "b2018", "b2019", "b2020", "b2021" ],
             "dependsOrder": "sequence",
             "group": {
                 "kind": "build",
